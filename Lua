@@ -31,14 +31,73 @@ local function cleanupAll()
         screenGui:Destroy()
     end
 end
-
 _G.DiamlaHub_Cleanup = cleanupAll
+
+-- === Loading Screen ===
+local loadingFrame = Instance.new("Frame")
+loadingFrame.Size = UDim2.new(0, 300, 0, 150)
+loadingFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+loadingFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+loadingFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+loadingFrame.BorderSizePixel = 0
+loadingFrame.Parent = screenGui
+Instance.new("UICorner", loadingFrame).CornerRadius = UDim.new(0, 12)
+
+-- Title
+local loadingLabel = Instance.new("TextLabel")
+loadingLabel.Size = UDim2.new(1, -20, 0, 30)
+loadingLabel.Position = UDim2.new(0, 10, 0, 10)
+loadingLabel.BackgroundTransparency = 1
+loadingLabel.Text = "Loading DiamlaHub"
+loadingLabel.Font = Enum.Font.GothamBold
+loadingLabel.TextSize = 22
+loadingLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+loadingLabel.TextXAlignment = Enum.TextXAlignment.Center
+loadingLabel.Parent = loadingFrame
+
+-- Subtitle
+local middleLabel = Instance.new("TextLabel")
+middleLabel.Size = UDim2.new(1, -20, 0, 40)
+middleLabel.Position = UDim2.new(0, 10, 0, 50)
+middleLabel.BackgroundTransparency = 1
+middleLabel.Text = "Trade Scam | Duper | Mutation | Spawner"
+middleLabel.Font = Enum.Font.Gotham
+middleLabel.TextSize = 16
+middleLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+middleLabel.TextWrapped = true
+middleLabel.TextXAlignment = Enum.TextXAlignment.Center
+middleLabel.Parent = loadingFrame
+
+-- Loading bar background
+local loadingBarBg = Instance.new("Frame")
+loadingBarBg.Size = UDim2.new(0.9, 0, 0, 20)
+loadingBarBg.Position = UDim2.new(0.05, 0, 0.75, 0)
+loadingBarBg.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+loadingBarBg.BorderSizePixel = 1
+loadingBarBg.BorderColor3 = Color3.fromRGB(255, 255, 255)
+loadingBarBg.Parent = loadingFrame
+Instance.new("UICorner", loadingBarBg).CornerRadius = UDim.new(0, 10)
+
+-- Loading bar fill
+local loadingBar = Instance.new("Frame")
+loadingBar.Size = UDim2.new(0, 0, 1, 0)
+loadingBar.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+loadingBar.BorderSizePixel = 0
+loadingBar.Parent = loadingBarBg
+Instance.new("UICorner", loadingBar).CornerRadius = UDim.new(0, 10)
+
+-- Tween the loading bar
+local TweenService = game:GetService("TweenService")
+local tweenInfo = TweenInfo.new(3, Enum.EasingStyle.Linear) -- 3 sec demo
+local goal = { Size = UDim2.new(1, 0, 1, 0) }
+local tween = TweenService:Create(loadingBar, tweenInfo, goal)
 
 -- === Warning Prompt ===
 local function showWarningPrompt(onClose)
     local warnFrame = Instance.new("Frame")
     warnFrame.Size = UDim2.new(0, 300, 0, 220)
-    warnFrame.Position = UDim2.new(0.5, -150, 0.5, -110)
+    warnFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+    warnFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
     warnFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
     warnFrame.BorderSizePixel = 0
     warnFrame.Parent = screenGui
@@ -88,223 +147,170 @@ local function showWarningPrompt(onClose)
     end)
 end
 
--- === Loading Screen ===
-local loadingFrame = Instance.new("Frame")
-loadingFrame.Size = UDim2.new(0, 300, 0, 150)
-loadingFrame.Position = UDim2.new(0.5, -150, 0.5, -75)
-loadingFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-loadingFrame.BorderSizePixel = 0
-loadingFrame.Parent = screenGui
-Instance.new("UICorner", loadingFrame).CornerRadius = UDim.new(0, 12)
+-- === Main UI ===
+local function showMainUI()
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0, 320, 0, 270)
+    frame.AnchorPoint = Vector2.new(0.5, 0.5)
+    frame.Position = UDim2.new(0.5, 0, 0.5, 0)
+    frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    frame.BorderSizePixel = 0
+    frame.Parent = screenGui
+    Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 15)
 
-local loadingLabel = Instance.new("TextLabel", loadingFrame)
-loadingLabel.Size = UDim2.new(1, 0, 0.25, 0)
-loadingLabel.Position = UDim2.new(0, 0, 0, 10)
-loadingLabel.BackgroundTransparency = 1
-loadingLabel.Text = "Loading DiamlaHub"
-loadingLabel.Font = Enum.Font.GothamBold
-loadingLabel.TextSize = 22
-loadingLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    local stroke = Instance.new("UIStroke", frame)
+    stroke.Thickness = 2
+    stroke.Color = Color3.fromRGB(255, 255, 255)
 
-local middleLabel = Instance.new("TextLabel", loadingFrame)
-middleLabel.Size = UDim2.new(1, 0, 0.25, 0)
-middleLabel.Position = UDim2.new(0, 0, 0.4, 0)
-middleLabel.BackgroundTransparency = 1
-middleLabel.Text = "Trade Scam | Duper | Mutation | Spawner"
-middleLabel.Font = Enum.Font.Gotham
-middleLabel.TextSize = 18
-middleLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+    local title = Instance.new("TextLabel", frame)
+    title.Size = UDim2.new(1, -40, 0, 40)
+    title.Position = UDim2.new(0, 10, 0, 0)
+    title.BackgroundTransparency = 1
+    title.Text = "DiamlaHub"
+    title.Font = Enum.Font.GothamBold
+    title.TextSize = 24
+    title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    title.TextXAlignment = Enum.TextXAlignment.Left
 
-local loadingBarBg = Instance.new("Frame", loadingFrame)
-loadingBarBg.Size = UDim2.new(0.9, 0, 0, 20)
-loadingBarBg.Position = UDim2.new(0.05, 0, 0.75, 0)
-loadingBarBg.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-Instance.new("UICorner", loadingBarBg).CornerRadius = UDim.new(0, 10)
+    local mainCloseBtn = Instance.new("TextButton", frame)
+    mainCloseBtn.Size = UDim2.new(0, 30, 0, 30)
+    mainCloseBtn.Position = UDim2.new(1, -35, 0, 5)
+    mainCloseBtn.Text = "X"
+    mainCloseBtn.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+    mainCloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    mainCloseBtn.Font = Enum.Font.GothamBold
+    mainCloseBtn.TextSize = 18
+    Instance.new("UICorner", mainCloseBtn).CornerRadius = UDim.new(0, 6)
+    mainCloseBtn.MouseButton1Click:Connect(cleanupAll)
 
-local loadingBar = Instance.new("Frame", loadingBarBg)
-loadingBar.Size = UDim2.new(0, 0, 1, 0)
-loadingBar.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
-loadingBar.BorderSizePixel = 0
-Instance.new("UICorner", loadingBar).CornerRadius = UDim.new(0, 10)
+    local footer = Instance.new("TextLabel", frame)
+    footer.Size = UDim2.new(1, 0, 0, 25)
+    footer.Position = UDim2.new(0, 0, 1, -25)
+    footer.BackgroundTransparency = 1
+    footer.Text = "Made by Kean Diamla"
+    footer.Font = Enum.Font.Gotham
+    footer.TextSize = 14
+    footer.TextColor3 = Color3.fromRGB(255, 255, 255)
 
--- Tween the loading bar
-local TweenService = game:GetService("TweenService")
-local tweenInfo = TweenInfo.new(10, Enum.EasingStyle.Linear)
-local goal = { Size = UDim2.new(1, 0, 1, 0) }
-local tween = TweenService:Create(loadingBar, tweenInfo, goal)
+    -- Draggable
+    local dragging, dragStart, startPos
+    local userInput = game:GetService("UserInputService")
 
+    frame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = frame.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+
+    userInput.InputChanged:Connect(function(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local delta = input.Position - dragStart
+            frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+
+    -- Function to create button with toggle
+    local function createButtonWithSwitch(name, code, yOffset)
+        local btnFrame = Instance.new("Frame", frame)
+        btnFrame.Size = UDim2.new(0, 300, 0, 40)
+        btnFrame.Position = UDim2.new(0.5, -150, 0, yOffset)
+        btnFrame.BackgroundTransparency = 1
+
+        local btnLabel = Instance.new("TextLabel", btnFrame)
+        btnLabel.Size = UDim2.new(0.7, 0, 1, 0)
+        btnLabel.Position = UDim2.new(0, 0, 0, 0)
+        btnLabel.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        btnLabel.Text = name
+        btnLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        btnLabel.Font = Enum.Font.GothamBold
+        btnLabel.TextSize = 16
+        Instance.new("UICorner", btnLabel).CornerRadius = UDim.new(0, 8)
+
+        local switch = Instance.new("Frame", btnFrame)
+        switch.Size = UDim2.new(0, 40, 0, 20)
+        switch.Position = UDim2.new(0.75, 0, 0.25, 0)
+        switch.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+        Instance.new("UICorner", switch).CornerRadius = UDim.new(1, 0)
+
+        local dot = Instance.new("Frame", switch)
+        dot.Size = UDim2.new(0, 16, 0, 16)
+        dot.Position = UDim2.new(0, 2, 0, 2)
+        dot.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        Instance.new("UICorner", dot).CornerRadius = UDim.new(1, 0)
+
+        local toggleState = false
+        local createdInstances = {}
+
+        local buttonClick = Instance.new("TextButton", switch)
+        buttonClick.Size = UDim2.new(1, 0, 1, 0)
+        buttonClick.BackgroundTransparency = 1
+        buttonClick.Text = ""
+
+        buttonClick.MouseButton1Click:Connect(function()
+            toggleState = not toggleState
+            dot:TweenPosition(
+                UDim2.new(0, toggleState and 22 or 2, 0, 2),
+                Enum.EasingDirection.Out,
+                Enum.EasingStyle.Sine,
+                0.15,
+                true
+            )
+            switch.BackgroundColor3 = toggleState and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(200, 0, 0)
+
+            if toggleState then
+                local existing = {}
+                for _, inst in ipairs(playerGui:GetDescendants()) do
+                    existing[inst] = true
+                end
+                local success, result = pcall(function()
+                    loadstring(code)()
+                end)
+                if not success then warn(result) end
+                createdInstances = {}
+                for _, inst in ipairs(playerGui:GetDescendants()) do
+                    if not existing[inst] then
+                        table.insert(createdInstances, inst)
+                    end
+                end
+            else
+                for _, inst in ipairs(createdInstances) do
+                    if inst and inst.Destroy then
+                        pcall(function() inst:Destroy() end)
+                    end
+                end
+                createdInstances = {}
+            end
+        end)
+    end
+
+    -- Buttons
+    local buttonNames = {"Trade Scam", "Dupe panel", "Mutation predictor", "Spawner Script"}
+    local scripts = {
+        'loadstring(game:HttpGet("https://raw.githubusercontent.com/DiamlaHub/Trade/refs/heads/main/TradeScript"))()',
+        'loadstring(game:HttpGet("https://raw.githubusercontent.com/DiamlaHub/Dupe/refs/heads/main/DupeScript"))()',
+        'loadstring(game:HttpGet("https://raw.githubusercontent.com/DiamlaHub/Mutation/refs/heads/main/MutationScript"))()',
+        [[
+        local Spawner = loadstring(game:HttpGet("https://gitlab.com/darkiedarkie/dark/-/raw/main/Spawner.lua"))()
+        Spawner.Load()
+        ]]
+    }
+
+    for i, code in ipairs(scripts) do
+        createButtonWithSwitch(buttonNames[i], code, 50 + (i-1)*50)
+    end
+end
+
+-- === Start the sequence ===
 tween.Completed:Connect(function()
     loadingFrame:Destroy()
     showWarningPrompt(function()
-        -- === Main UI ===
-        local function showMainUI()
-            local frame = Instance.new("Frame")
-            frame.Size = UDim2.new(0, 320, 0, 270)
-            frame.Position = UDim2.new(0.5, -160, 0.5, -135)
-            frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-            frame.BorderSizePixel = 0
-            frame.Parent = screenGui
-            Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 15)
-
-            local stroke = Instance.new("UIStroke", frame)  
-            stroke.Thickness = 2  
-            stroke.Color = Color3.fromRGB(255, 255, 255)  
-            stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border  
-
-            local title = Instance.new("TextLabel", frame)  
-            title.Size = UDim2.new(1, -40, 0, 40)  
-            title.Position = UDim2.new(0, 10, 0, 0)  
-            title.BackgroundTransparency = 1  
-            title.Text = "DiamlaHub"  
-            title.Font = Enum.Font.GothamBold  
-            title.TextSize = 24  
-            title.TextColor3 = Color3.fromRGB(255, 255, 255)  
-            title.TextXAlignment = Enum.TextXAlignment.Left  
-
-            local mainCloseBtn = Instance.new("TextButton")  
-            mainCloseBtn.Size = UDim2.new(0, 30, 0, 30)  
-            mainCloseBtn.Position = UDim2.new(1, -35, 0, 5)  
-            mainCloseBtn.Text = "X"  
-            mainCloseBtn.BackgroundColor3 = Color3.fromRGB(200, 0, 0)  
-            mainCloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)  
-            mainCloseBtn.Font = Enum.Font.GothamBold  
-            mainCloseBtn.TextSize = 18  
-            mainCloseBtn.Parent = frame  
-            Instance.new("UICorner", mainCloseBtn).CornerRadius = UDim.new(0, 6)  
-            mainCloseBtn.MouseButton1Click:Connect(cleanupAll)  
-
-            local footer = Instance.new("TextLabel", frame)  
-            footer.Size = UDim2.new(1, 0, 0, 25)  
-            footer.Position = UDim2.new(0, 0, 1, -25)  
-            footer.BackgroundTransparency = 1  
-            footer.Text = "Made by Kean Diamla"  
-            footer.Font = Enum.Font.Gotham  
-            footer.TextSize = 14  
-            footer.TextColor3 = Color3.fromRGB(255, 255, 255)  
-
-            -- Draggable  
-            local dragging, dragStart, startPos  
-            local userInput = game:GetService("UserInputService")  
-
-            frame.InputBegan:Connect(function(input)  
-                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then  
-                    dragging = true  
-                    dragStart = input.Position  
-                    startPos = frame.Position  
-                    input.Changed:Connect(function()  
-                        if input.UserInputState == Enum.UserInputState.End then  
-                            dragging = false  
-                        end  
-                    end)  
-                end  
-            end)  
-
-            userInput.InputChanged:Connect(function(input)  
-                if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then  
-                    local delta = input.Position - dragStart  
-                    frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)  
-                end  
-            end)  
-
-            -- Function to create a button with a toggle switch  
-            local function createButtonWithSwitch(name, code, yOffset)  
-                local btnFrame = Instance.new("Frame", frame)  
-                btnFrame.Size = UDim2.new(0, 300, 0, 40)  
-                btnFrame.Position = UDim2.new(0.5, -150, 0, yOffset)  
-                btnFrame.BackgroundTransparency = 1  
-
-                local btnLabel = Instance.new("TextLabel", btnFrame)  
-                btnLabel.Size = UDim2.new(0.7, 0, 1, 0)  
-                btnLabel.Position = UDim2.new(0, 0, 0, 0)  
-                btnLabel.BackgroundTransparency = 0  
-                btnLabel.BackgroundColor3 = Color3.fromRGB(40, 40, 40)  
-                btnLabel.Text = name  
-                btnLabel.TextColor3 = Color3.fromRGB(255, 255, 255)  
-                btnLabel.Font = Enum.Font.GothamBold  
-                btnLabel.TextSize = 16  
-                Instance.new("UICorner", btnLabel).CornerRadius = UDim.new(0, 8)  
-
-                -- Toggle switch  
-                local switch = Instance.new("Frame", btnFrame)  
-                switch.Size = UDim2.new(0, 40, 0, 20)  
-                switch.Position = UDim2.new(0.75, 0, 0.25, 0)  
-                switch.BackgroundColor3 = Color3.fromRGB(200, 0, 0)  
-                Instance.new("UICorner", switch).CornerRadius = UDim.new(1, 0)  
-
-                local dot = Instance.new("Frame", switch)  
-                dot.Size = UDim2.new(0, 16, 0, 16)  
-                dot.Position = UDim2.new(0, 2, 0, 2)  
-                dot.BackgroundColor3 = Color3.fromRGB(255, 255, 255)  
-                Instance.new("UICorner", dot).CornerRadius = UDim.new(1, 0)  
-
-                local toggleState = false  
-                local createdInstances = {}  
-
-                local buttonClick = Instance.new("TextButton", switch)  
-                buttonClick.Size = UDim2.new(1, 0, 1, 0)  
-                buttonClick.BackgroundTransparency = 1  
-                buttonClick.Text = ""  
-
-                buttonClick.MouseButton1Click:Connect(function()  
-                    toggleState = not toggleState  
-                    dot:TweenPosition(  
-                        UDim2.new(0, toggleState and 22 or 2, 0, 2),  
-                        Enum.EasingDirection.Out,  
-                        Enum.EasingStyle.Sine,  
-                        0.15,  
-                        true  
-                    )  
-                    switch.BackgroundColor3 = toggleState and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(200, 0, 0)  
-
-                    if toggleState then  
-                        -- Record existing instances in PlayerGui  
-                        local existing = {}  
-                        for _, inst in ipairs(playerGui:GetDescendants()) do  
-                            existing[inst] = true  
-                        end  
-
-                        -- Execute loadstring normally  
-                        local success, result = pcall(function()  
-                            loadstring(code)()  
-                        end)  
-                        if not success then warn(result) end  
-
-                        -- Track new instances  
-                        createdInstances = {}  
-                        for _, inst in ipairs(playerGui:GetDescendants()) do  
-                            if not existing[inst] then  
-                                table.insert(createdInstances, inst)  
-                            end  
-                        end  
-                    else  
-                        -- Destroy newly created instances  
-                        for _, inst in ipairs(createdInstances) do  
-                            if inst and inst.Destroy then  
-                                pcall(function() inst:Destroy() end)  
-                            end  
-                        end  
-                        createdInstances = {}  
-                    end  
-                end)  
-            end  
-
-            -- Buttons  
-            local buttonNames = {"Trade Scam", "Dupe panel", "Mutation predictor", "Spawner Script"}  
-            local scripts = {  
-                'loadstring(game:HttpGet("https://raw.githubusercontent.com/DiamlaHub/Trade/refs/heads/main/TradeScript"))()',  
-                'loadstring(game:HttpGet("https://raw.githubusercontent.com/DiamlaHub/Dupe/refs/heads/main/DupeScript"))()',  
-                'loadstring(game:HttpGet("https://raw.githubusercontent.com/DiamlaHub/Mutation/refs/heads/main/MutationScript"))()',  
-                [[  
-                local Spawner = loadstring(game:HttpGet("https://gitlab.com/darkiedarkie/dark/-/raw/main/Spawner.lua"))()  
-                Spawner.Load()  
-                ]]  
-            }  
-
-            for i, code in ipairs(scripts) do  
-                createButtonWithSwitch(buttonNames[i], code, 50 + (i-1)*50)  
-            end
-        end
-
         showMainUI()
     end)
 end)
