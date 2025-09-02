@@ -1,4 +1,3 @@
--- === Kill old instance if re-executed ===
 if _G.DiamlaHub_Cleanup then
     _G.DiamlaHub_Cleanup()
 end
@@ -12,9 +11,10 @@ local playerGui = player:WaitForChild("PlayerGui")
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "DiamlaHubGUI"
 screenGui.ResetOnSpawn = false
+screenGui.IgnoreGuiInset = true
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 screenGui.Parent = playerGui
 
--- Cleanup function
 local function cleanupAll()
     _G.DiamlaHub_Active = false
     for _, thread in ipairs(_G.DiamlaHub_Threads) do
@@ -33,29 +33,27 @@ local function cleanupAll()
 end
 _G.DiamlaHub_Cleanup = cleanupAll
 
--- === Loading Screen ===
 local loadingFrame = Instance.new("Frame")
 loadingFrame.Size = UDim2.new(0, 300, 0, 150)
 loadingFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 loadingFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-loadingFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+loadingFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 loadingFrame.BorderSizePixel = 0
+loadingFrame.ZIndex = 10
 loadingFrame.Parent = screenGui
 Instance.new("UICorner", loadingFrame).CornerRadius = UDim.new(0, 12)
 
--- Title
 local loadingLabel = Instance.new("TextLabel")
 loadingLabel.Size = UDim2.new(1, -20, 0, 30)
 loadingLabel.Position = UDim2.new(0, 10, 0, 10)
 loadingLabel.BackgroundTransparency = 1
-loadingLabel.Text = "Loading DiamlaHub"
+loadingLabel.Text = "Loading DiamlaHub..."
 loadingLabel.Font = Enum.Font.GothamBold
 loadingLabel.TextSize = 22
 loadingLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-loadingLabel.TextXAlignment = Enum.TextXAlignment.Center
+loadingLabel.ZIndex = 11
 loadingLabel.Parent = loadingFrame
 
--- Subtitle
 local middleLabel = Instance.new("TextLabel")
 middleLabel.Size = UDim2.new(1, -20, 0, 40)
 middleLabel.Position = UDim2.new(0, 10, 0, 50)
@@ -65,89 +63,30 @@ middleLabel.Font = Enum.Font.Gotham
 middleLabel.TextSize = 16
 middleLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
 middleLabel.TextWrapped = true
-middleLabel.TextXAlignment = Enum.TextXAlignment.Center
+middleLabel.ZIndex = 11
 middleLabel.Parent = loadingFrame
 
--- Loading bar background
 local loadingBarBg = Instance.new("Frame")
 loadingBarBg.Size = UDim2.new(0.9, 0, 0, 20)
 loadingBarBg.Position = UDim2.new(0.05, 0, 0.75, 0)
 loadingBarBg.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
-loadingBarBg.BorderSizePixel = 1
-loadingBarBg.BorderColor3 = Color3.fromRGB(255, 255, 255)
+loadingBarBg.ZIndex = 11
 loadingBarBg.Parent = loadingFrame
 Instance.new("UICorner", loadingBarBg).CornerRadius = UDim.new(0, 10)
 
--- Loading bar fill
 local loadingBar = Instance.new("Frame")
 loadingBar.Size = UDim2.new(0, 0, 1, 0)
 loadingBar.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
 loadingBar.BorderSizePixel = 0
+loadingBar.ZIndex = 12
 loadingBar.Parent = loadingBarBg
 Instance.new("UICorner", loadingBar).CornerRadius = UDim.new(0, 10)
 
--- Tween the loading bar
 local TweenService = game:GetService("TweenService")
-local tweenInfo = TweenInfo.new(3, Enum.EasingStyle.Linear) -- 3 sec demo
+local tweenInfo = TweenInfo.new(10, Enum.EasingStyle.Linear)
 local goal = { Size = UDim2.new(1, 0, 1, 0) }
 local tween = TweenService:Create(loadingBar, tweenInfo, goal)
 
--- === Warning Prompt ===
-local function showWarningPrompt(onClose)
-    local warnFrame = Instance.new("Frame")
-    warnFrame.Size = UDim2.new(0, 300, 0, 220)
-    warnFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-    warnFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-    warnFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    warnFrame.BorderSizePixel = 0
-    warnFrame.Parent = screenGui
-    Instance.new("UICorner", warnFrame).CornerRadius = UDim.new(0, 12)
-
-    local stroke = Instance.new("UIStroke", warnFrame)
-    stroke.Thickness = 1
-    stroke.Color = Color3.fromRGB(255, 255, 255)
-
-    local header = Instance.new("TextLabel")
-    header.Size = UDim2.new(1, -20, 0, 30)
-    header.Position = UDim2.new(0, 10, 0, 5)
-    header.BackgroundTransparency = 1
-    header.Text = "⚠️ IMPORTANT ⚠️"
-    header.TextColor3 = Color3.fromRGB(255, 200, 0)
-    header.Font = Enum.Font.GothamBold
-    header.TextSize = 18
-    header.Parent = warnFrame
-
-    local msg = Instance.new("TextLabel")
-    msg.Size = UDim2.new(1, -20, 1, -70)
-    msg.Position = UDim2.new(0, 10, 0, 40)
-    msg.BackgroundTransparency = 1
-    msg.Text = "1. Rejoin\n2. Go to delta settings\n3. Turn off verify teleport, Anti scam, Anti Afk\n4. Reexecute\n5. You're all set"
-    msg.TextWrapped = true
-    msg.TextColor3 = Color3.fromRGB(255, 255, 255)
-    msg.Font = Enum.Font.Gotham
-    msg.TextSize = 14
-    msg.TextXAlignment = Enum.TextXAlignment.Left
-    msg.TextYAlignment = Enum.TextYAlignment.Top
-    msg.Parent = warnFrame
-
-    local okBtn = Instance.new("TextButton")
-    okBtn.Size = UDim2.new(0.6, 0, 0, 30)
-    okBtn.Position = UDim2.new(0.2, 0, 1, -40)
-    okBtn.Text = "Got it"
-    okBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
-    okBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    okBtn.Font = Enum.Font.GothamBold
-    okBtn.TextSize = 16
-    okBtn.Parent = warnFrame
-    Instance.new("UICorner", okBtn).CornerRadius = UDim.new(0, 6)
-
-    okBtn.MouseButton1Click:Connect(function()
-        warnFrame:Destroy()
-        if onClose then onClose() end
-    end)
-end
-
--- === Main UI ===
 local function showMainUI()
     local frame = Instance.new("Frame")
     frame.Size = UDim2.new(0, 320, 0, 270)
@@ -155,6 +94,7 @@ local function showMainUI()
     frame.Position = UDim2.new(0.5, 0, 0.5, 0)
     frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
     frame.BorderSizePixel = 0
+    frame.ZIndex = 30
     frame.Parent = screenGui
     Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 15)
 
@@ -192,7 +132,6 @@ local function showMainUI()
     footer.TextSize = 14
     footer.TextColor3 = Color3.fromRGB(255, 255, 255)
 
-    -- Draggable
     local dragging, dragStart, startPos
     local userInput = game:GetService("UserInputService")
 
@@ -216,7 +155,6 @@ local function showMainUI()
         end
     end)
 
-    -- Function to create button with toggle
     local function createButtonWithSwitch(name, code, yOffset)
         local btnFrame = Instance.new("Frame", frame)
         btnFrame.Size = UDim2.new(0, 300, 0, 40)
@@ -225,7 +163,6 @@ local function showMainUI()
 
         local btnLabel = Instance.new("TextLabel", btnFrame)
         btnLabel.Size = UDim2.new(0.7, 0, 1, 0)
-        btnLabel.Position = UDim2.new(0, 0, 0, 0)
         btnLabel.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
         btnLabel.Text = name
         btnLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -290,7 +227,6 @@ local function showMainUI()
         end)
     end
 
-    -- Buttons
     local buttonNames = {"Trade Scam", "Dupe panel", "Mutation predictor", "Spawner Script"}
     local scripts = {
         'loadstring(game:HttpGet("https://raw.githubusercontent.com/DiamlaHub/Trade/refs/heads/main/TradeScript"))()',
@@ -307,12 +243,76 @@ local function showMainUI()
     end
 end
 
--- === Start the sequence ===
-tween.Completed:Connect(function()
-    loadingFrame:Destroy()
+local function showWarningPrompt(onClose)
+    local warnFrame = Instance.new("Frame")
+    warnFrame.Size = UDim2.new(0, 300, 0, 220)
+    warnFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+    warnFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+    warnFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    warnFrame.ZIndex = 20
+    warnFrame.Parent = screenGui
+    Instance.new("UICorner", warnFrame).CornerRadius = UDim.new(0, 12)
+
+    local stroke = Instance.new("UIStroke", warnFrame)
+    stroke.Thickness = 1
+    stroke.Color = Color3.fromRGB(255, 255, 255)
+
+    local header = Instance.new("TextLabel")
+    header.Size = UDim2.new(1, -20, 0, 30)
+    header.Position = UDim2.new(0, 10, 0, 5)
+    header.BackgroundTransparency = 1
+    header.Text = "⚠️ IMPORTANT ⚠️"
+    header.TextColor3 = Color3.fromRGB(255, 200, 0)
+    header.Font = Enum.Font.GothamBold
+    header.TextSize = 18
+    header.ZIndex = 21
+    header.Parent = warnFrame
+
+    local msg = Instance.new("TextLabel")
+    msg.Size = UDim2.new(1, -20, 1, -70)
+    msg.Position = UDim2.new(0, 10, 0, 40)
+    msg.BackgroundTransparency = 1
+    msg.Text = "1. Rejoin\n2. Go to delta settings\n3. Turn off verify teleport, Anti scam, Anti Afk\n4. Reexecute\n5. You're all set"
+    msg.TextWrapped = true
+    msg.TextColor3 = Color3.fromRGB(255, 255, 255)
+    msg.Font = Enum.Font.Gotham
+    msg.TextSize = 14
+    msg.TextXAlignment = Enum.TextXAlignment.Left
+    msg.TextYAlignment = Enum.TextYAlignment.Top
+    msg.ZIndex = 21
+    msg.Parent = warnFrame
+
+    local okBtn = Instance.new("TextButton")
+    okBtn.Size = UDim2.new(0.6, 0, 0, 30)
+    okBtn.Position = UDim2.new(0.2, 0, 1, -40)
+    okBtn.Text = "Got it"
+    okBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+    okBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    okBtn.Font = Enum.Font.GothamBold
+    okBtn.TextSize = 16
+    okBtn.ZIndex = 22
+    okBtn.Parent = warnFrame
+    Instance.new("UICorner", okBtn).CornerRadius = UDim.new(0, 6)
+
+    okBtn.MouseButton1Click:Connect(function()
+        warnFrame:Destroy()
+        if onClose then onClose() end
+    end)
+end
+
+local function startMain()
+    if loadingFrame and loadingFrame.Parent then
+        loadingFrame:Destroy()
+    end
     showWarningPrompt(function()
         showMainUI()
     end)
-end)
+end
 
+tween.Completed:Connect(startMain)
 tween:Play()
+task.delay(10.2, function()
+    if loadingFrame and loadingFrame.Parent then
+        startMain()
+    end
+end)
